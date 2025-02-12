@@ -4,6 +4,7 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use crate::application::Application;
 
 mod application;
+pub mod texture;
 
 fn main() {
     unsafe { env::set_var("RUST_LOG", "debug") };
