@@ -1,10 +1,17 @@
+#![allow(
+    unused_imports,
+    unused_mut,
+    dead_code,
+)]
 use std::env;
 use log::error;
 use winit::event_loop::{ControlFlow, EventLoop};
-use crate::application::Application;
+use crate::app::Application;
 
-mod application;
+pub mod app;
 pub mod texture;
+mod model;
+mod resources;
 
 fn main() {
     unsafe { env::set_var("RUST_LOG", "debug") };
