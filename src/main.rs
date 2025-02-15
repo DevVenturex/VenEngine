@@ -12,6 +12,9 @@ pub mod app;
 pub mod texture;
 mod model;
 mod resources;
+mod window;
+mod Instance;
+mod camera;
 
 fn main() {
     unsafe { env::set_var("RUST_LOG", "debug") };
