@@ -1,5 +1,7 @@
+use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
+use std::borrow::BorrowMut;
 use bytemuck::Pod;
 use log::{error, info, warn};
 use wgpu::util::{DeviceExt, RenderEncoder};
@@ -204,7 +206,7 @@ impl InstanceRaw {
     }
 }
 
-pub struct State<'a> {
+pub struct WindowState<'a> {
     surface: wgpu::Surface<'a>,
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -223,8 +225,8 @@ pub struct State<'a> {
     window: Arc<Window>,
 }
 
-impl<'a> State<'a> {
-    pub async fn new(window: Arc<Window>) -> State<'a> {
+impl<'a> WindowState<'a> {
+    pub async fn new(window: Arc<Window>) -> WindowState<'a> {
         let size = window.inner_size();
 
         warn!("WGPU setup");
@@ -468,11 +470,12 @@ impl<'a> State<'a> {
 
     pub fn resize(&mut self, size: winit::dpi::PhysicalSize<u32>) {
         if size.width > 0 && size.height > 0 {
-            self.depth_texture = Texture::create_death_texture(&self.device, &self.config, "depth_texture");
-            self.size = size;
             self.config.width = size.width;
             self.config.height = size.height;
+            self.size = size;
+            self.camera.aspect = self.config.width as f32 / self.config.height as f32;
             self.surface.configure(&self.device, &self.config);
+            self.depth_texture = Texture::create_death_texture(&self.device, &self.config, "depth_texture");
         }
     }
 
@@ -539,26 +542,24 @@ impl<'a> State<'a> {
 
 #[derive(Default)]
 pub struct Application<'a> {
-    window: Option<Arc<Window>>,
-    state: Option<State<'a>>,
+    window_state: Option<WindowState<'a>>,
 }
 
 impl ApplicationHandler for Application<'_> {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        if self.window.is_none() {
+        if self.window_state.is_none() {
             let window = Arc::new(event_loop.create_window(window_attributes()).unwrap());
-            self.window = Some(window.clone());
-            let state = executor::block_on(State::new(window.clone()));
-            self.state = Some(state);
+            let state = executor::block_on(WindowState::new(window.clone()));
+            self.window_state = Some(state);
         }
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, window_id: WindowId, event: WindowEvent) {
-        if window_id != self.window.as_ref().unwrap().id() {
+        if window_id != self.window_state.as_ref().unwrap().window.id() {
             return;
         }
-        let mut state = self.state.as_mut().unwrap();
-        if !state.input(&event) {
+        let mut window = self.window_state.as_mut().unwrap();
+        if !window.input(&event) {
             match event {
                 WindowEvent::CloseRequested
                 | WindowEvent::KeyboardInput {
@@ -571,7 +572,7 @@ impl ApplicationHandler for Application<'_> {
                     ..
                 } => event_loop.exit(),
                 WindowEvent::Resized(size) => {
-                    self.state.as_mut().unwrap().resize(size);
+                    window.resize(size);
                 }
                 _ => {}
             }
@@ -579,7 +580,7 @@ impl ApplicationHandler for Application<'_> {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
-        let state = self.state.as_mut().unwrap();
+        let mut state = self.window_state.as_mut().unwrap();
         state.window.request_redraw();
 
         state.update();
