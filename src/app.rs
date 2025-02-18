@@ -14,6 +14,7 @@ use cgmath::prelude::*;
 use futures::executor;
 use winit::dpi::LogicalSize;
 use crate::{model, resources};
+use crate::layers::LayerStack;
 use crate::model::{DrawModel, Vertex};
 use crate::texture::Texture;
 use crate::window::WindowState;
@@ -23,6 +24,7 @@ use crate::window::WindowState;
 #[derive(Default)]
 pub struct Application<'a> {
     window_state: Option<WindowState<'a>>,
+    layer_stack: &'a mut LayerStack,
 }
 
 impl ApplicationHandler for Application<'_> {
@@ -39,7 +41,7 @@ impl ApplicationHandler for Application<'_> {
             return;
         }
         let mut window = self.window_state.as_mut().unwrap();
-        if !window.event(&event) {
+        if !window.event(&event) && !self.layer_stack.layer_stack().iter_mut().all(|layer| { layer.event(&event) }) {
             match event {
                 WindowEvent::CloseRequested
                 | WindowEvent::KeyboardInput {

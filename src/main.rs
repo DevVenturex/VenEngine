@@ -15,6 +15,7 @@ mod resources;
 mod window;
 mod Instance;
 mod camera;
+mod layers;
 
 fn main() {
     unsafe { env::set_var("RUST_LOG", "debug") };
