@@ -1,4 +1,6 @@
-[workspace]
-resolver = "1"
-members = ["core", "sandbox"]
-default-members = ["core", "sandbox"]
+[package]
+name = "venengine"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
