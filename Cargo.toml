@@ -4,3 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+image = "0.25.8"
+anyhow = "1.0.99"
+bytemuck = { version = "1.23.2", features = ["derive"] }
+env_logger = "0.11.8"
+log = "0.4.28"
+pollster = "0.4.0"
+wgpu = "26.0.1"
+winit = "0.30.12"
+cgmath = "0.18.0"
+tobj = { version = "4.0.3", default-features = false, features = ["async"]}
