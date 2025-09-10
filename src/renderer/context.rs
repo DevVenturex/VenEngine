@@ -1,21 +1,19 @@
 #![allow(dead_code)]
-
-use std::{process::Output, sync::Arc};
+use std::sync::Arc;
 
 use anyhow::Result;
 use winit::window::Window;
 
-pub struct Context {
-    pub surface: wgpu::Surface<'static>,
+pub struct Context<'a> {
+    pub surface: wgpu::Surface<'a>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub config: wgpu::SurfaceConfiguration,
     pub is_surface_configured: bool,
-    pub render_pipeline: Option<wgpu::RenderPipeline>,
     pub window: Arc<Window>,
 }
 
-impl Context {
+impl<'a> Context<'a> {
     pub async fn new(window: Arc<Window>) -> Result<Self> {
         let size = window.inner_size();
 
@@ -69,47 +67,39 @@ impl Context {
             queue,
             config,
             is_surface_configured: false,
-            render_pipeline: None,
             window
         })
     }
 
-    pub fn create_render_pipeline(&mut self) {
-        let shader = self.device.create_shader_module(wgpu::ShaderModuleDescriptor {
-            label: Some("Shader"),
-            source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
-        });
+    pub fn create_render_pipeline(&self, desc: wgpu::ShaderModuleDescriptor) -> wgpu::RenderPipeline {
+        let shader = self.device.create_shader_module(desc);
 
         let render_pipeline_layout =
             self.device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[
-                    // &texture_bind_group_layout,
-                    // &camera_bind_group_layout,  
-                ],
-                push_constant_ranges: &[],
+                    label: Some("Render Pipeline Layout"),
+                    bind_group_layouts: &[],
+                    push_constant_ranges: &[],
             });
-
-        let render_pipeline = self.device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        
+        self.device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: Some("vs_main"),
-                buffers: &[
-                    // model::ModelVertex::desc(),
-                    // RawInstance::desc(),
-                ],
+                buffers: &[],
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
                 entry_point: Some("fs_main"),
-                targets: &[Some(wgpu::ColorTargetState {
-                    format: self.config.format,
-                    blend: Some(wgpu::BlendState::REPLACE),
-                    write_mask: wgpu::ColorWrites::ALL,
-                })],
+                targets: &[Some(
+                    wgpu::ColorTargetState {
+                        format: self.config.format,
+                        blend: Some(wgpu::BlendState::REPLACE),
+                        write_mask: wgpu::ColorWrites::ALL,
+                    }
+                )],
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
             }),
             primitive: wgpu::PrimitiveState {
@@ -121,13 +111,6 @@ impl Context {
                 unclipped_depth: false,
                 conservative: false,
             },
-            /* depth_stencil: Some(wgpu::DepthStencilState {
-                format: texture::Texture::DEPTH_FORMAT,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Less,
-                stencil: wgpu::StencilState::default(),
-                bias: wgpu::DepthBiasState::default(),
-            }), */
             depth_stencil: None,
             multisample: wgpu::MultisampleState {
                 count: 1,
@@ -136,8 +119,39 @@ impl Context {
             },
             multiview: None,
             cache: None,
+        })
+    }
+
+    pub fn create_render_pass(&mut self) -> wgpu::RenderPass<'a> {
+        let output = self.surface.get_current_texture().unwrap();
+        let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
+
+        let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: Some("Render Encoder")
         });
-        self.render_pipeline = Some(render_pipeline);
+
+        encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("Render Pass"),
+                color_attachments: &[
+                    Some(wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color {
+                                r: 0.1,
+                                g: 0.2,
+                                b: 0.3,
+                                a: 1.0,
+                            }),
+                            store: wgpu::StoreOp::Store,
+                        },
+                        depth_slice: Default::default(),
+                    })
+                ],
+                depth_stencil_attachment: None,
+                occlusion_query_set: None,
+                timestamp_writes: None,
+            })
     }
 
     pub fn resize(&mut self, width: u32, height: u32) {
@@ -145,53 +159,8 @@ impl Context {
             self.config.width = width;
             self.config.height = height;
             self.is_surface_configured = true;
-            //self.camera.aspect = self.config.width as f32 / self.config.height as f32;
             self.surface.configure(&self.device, &self.config);
-            //self.depth_texture = texture::Texture::create_depth_texture(&self.device, &self.config, "depth_texture");
         }
     }
-    // this must go somewhere else
-    pub fn create_render_pass(&self, surface_texture: &wgpu::SurfaceTexture, encoder: &mut wgpu::CommandEncoder) -> Result<(), wgpu::SurfaceError>  {
-        let view = surface_texture.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-        let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-            label: Some("Render Pass"),
-            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                view: &view,
-                resolve_target: None,
-                ops: wgpu::Operations {
-                    load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: 0.1,
-                        g: 0.2,
-                        b: 0.3,
-                        a: 1.0,
-                    }),
-                    store: wgpu::StoreOp::Store,
-                },
-                depth_slice: Default::default(),
-            })],
-            /*depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                view: &self.depth_texture.view,
-                depth_ops: Some(wgpu::Operations {
-                    load: wgpu::LoadOp::Clear(1.0),
-                    store: wgpu::StoreOp::Store,
-                }),
-                stencil_ops: None,
-            }),*/
-            depth_stencil_attachment: None,
-            occlusion_query_set: None,
-            timestamp_writes: None,
-        });
-        /*render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
-            render_pass.set_pipeline(&self.render_pipeline);
-            render_pass.draw_model_instanced(
-                &self.obj_model,
-                0..self.instances.len() as u32,
-                &self.camera_bind_group
-            );*/
-        
-        Ok(())
-    }
-
-    
 }
