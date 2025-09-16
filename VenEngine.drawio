@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0" version="28.2.1">
   <diagram name="Page-1" id="SgjVkiHpOriX0zcrWdsi">
-    <mxGraphModel dx="3227" dy="2580" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2208" dy="1946" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -63,7 +63,7 @@
         <mxCell id="oiWjbPKBmij4qANT0MO2-40" value="Asset Loader / IO" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="345" y="630" width="110" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="oiWjbPKBmij4qANT0MO2-43" value="&lt;b&gt;Event&lt;/b&gt;" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="oiWjbPKBmij4qANT0MO2-43" value="&lt;b&gt;Event&lt;/b&gt;&amp;lt;T&amp;gt;" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="660" y="-123" width="140" height="156" as="geometry" />
         </mxCell>
         <mxCell id="oiWjbPKBmij4qANT0MO2-44" value="sender_id: u32" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="oiWjbPKBmij4qANT0MO2-43" vertex="1">
@@ -78,7 +78,7 @@
         <mxCell id="oiWjbPKBmij4qANT0MO2-51" value="event_type: EventType" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="oiWjbPKBmij4qANT0MO2-43" vertex="1">
           <mxGeometry y="104" width="140" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="oiWjbPKBmij4qANT0MO2-52" value="payload" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="oiWjbPKBmij4qANT0MO2-43" vertex="1">
+        <mxCell id="oiWjbPKBmij4qANT0MO2-52" value="payload: T" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="oiWjbPKBmij4qANT0MO2-43" vertex="1">
           <mxGeometry y="130" width="140" height="26" as="geometry" />
         </mxCell>
         <mxCell id="oiWjbPKBmij4qANT0MO2-91" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="c7YChy65UK7itfgcdQi3-41" target="oiWjbPKBmij4qANT0MO2-89" edge="1">
@@ -231,6 +231,9 @@
         </mxCell>
         <mxCell id="c7YChy65UK7itfgcdQi3-78" value="EventQueue" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
           <mxGeometry x="935" y="-70" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c7YChy65UK7itfgcdQi3-83" value="&amp;nbsp;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="-350" width="40" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
