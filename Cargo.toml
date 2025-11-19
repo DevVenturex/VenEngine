@@ -1,8 +1,17 @@
+[package]
+name = "venengine"
+version = "0.1.0"
+edition = "2024"
+
 [workspace]
 resolver = "2"
-members = ["crates/application", "crates/render", "crates/window","sandbox"]
+members = [
+    "crates/*",
+]
+exclude = ["sandbox"]
 
 [workspace.dependencies]
 anyhow = "1.0.100"
 log = "0.4.28"
 raw-window-handle = "0.6.2"
+
